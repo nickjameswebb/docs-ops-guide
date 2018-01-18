@@ -5,27 +5,27 @@ owner: Identity
 ---
 ##<a id="overview"></a>Overview 
 
-
 This document lays out initial groundwork for integrating PCF, Active Directory, and Active Directory Federation Services (ADFS) to meet system security requirements. 
-
-User Access Scenario One – Pivotal Operations Manager
-Administrator access to the PCF Operations Manager web portal is the first user access requirement solved via the integration of Microsoft Active Directory, Microsoft Active Directory Federation Services, and PCF. 
 
 ##<a id="scenario-one-overview"></a>Scenario One Overview
 
-The step by step workflow presented above is explained below utilizing the numbers depicted in Figure 1 - Ops Manager Access Workflow as reference:
+![Figure 1 Ops Manager Access Workflow](Figure1_OpsManAccess.png)
 
-Users navigate to the PCF Ops Manager Login Screen – typically https://PCF-IP/uaa or https://PCF-Hostname/uaa.
-PCF checks to see if the user is authenticated, because the user is not authenticated the application returns a status back to the user.
-PCF creates a SAML assertion with the Microsoft ADFS server and redirects users to the Microsoft ADFS web portal to facilitate Single Sign On.
-Users enter their credentials at the ADFS portal login screen, these credentials are sent to the Microsoft Active Directory Server via Integrated Windows Authentication (IWA) usually Kerberos or NTLM.
-The Microsoft Active Directory Server performs a user lookup and validates user credentials.
-Active Directory returns a response to the ADFS server via IWA, additionally the ADFS processes claim rules set up for the claims aware application
-The ADFS Server sends a Security Token over TLS to the user with the requested claim rule information. Claim rules may be utilized to control specific access to applications and allow developers to build claim-aware applications to support Role Based Access Controls.
-The User sends the received token with associated claim rules back to the PCF portal.
-If the ADFS Claim Rule passes and the correct information is presented to the PCF Ops Manager portal via the SAML token the user is logged into the Portal.
+The step by step Ops Manager Access Workflow depicted in Figure 1 is explained below:
 
-When a user navigates to the Pivotal Cloud Foundry login portal, they are immediately forwarded to the ADFS Single Sign On portal depicted in Figure 2 which has been integrated with PCF via the creation of relying trusts.
+1. Users navigate to the PCF Ops Manager Login Screen – typically [https://PCF-IP/uaa](hhttps://PCF-IP/uaa) or [https://PCF-Hostname/uaa] (https://PCF-Hostname/uaa).
+1. PCF checks to see if the user is authenticated, because the user is not authenticated the application returns a status back to the user.
+1. PCF creates a SAML assertion with the Microsoft ADFS server and redirects users to the Microsoft ADFS web portal to facilitate Single sign-on (SSO).
+1. Users enter their credentials at the ADFS portal login screen, these credentials are sent to the Microsoft Active Directory Server via Integrated Windows Authentication (IWA) usually Kerberos or NTLM.
+1. The Microsoft Active Directory Server performs a user lookup and validates user credentials.
+1. Active Directory returns a response to the ADFS server via IWA, additionally the ADFS processes claim rules set up for the claims aware application
+1. The ADFS Server sends a Security Token over TLS to the user with the requested claim rule information. Claim rules may be utilized to control specific access to applications and allow developers to build claim-aware applications to support Role Based Access Controls.
+1. The User sends the received token with associated claim rules back to the PCF portal.
+1. If the ADFS Claim Rule passes and the correct information is presented to the PCF Ops Manager portal via the SAML token the user is logged into the Portal.
+
+![Figure 2 Pivotal Cloud Foundry Log In Portal](Figure2ADFSlogin.png)
+<p class="note"><strong>Note: </strong> When a user navigates to the PCF log in portal, they are immediately forwarded to the ADFS SSO portal depicted in Figure 2 which has been integrated with PCF via the creation of relying trusts.
+</p>
 
 Figure 2 - ADFS Login Portal
 ##<a id="scenario-one-implementation"></a>Scenario One Implementation
@@ -55,7 +55,7 @@ If you have already installed Ops Manager, follow these steps:
 1. Navigate to the following URL to obtain the XML file with information required for the ADFS setup `https://OPS-MANAGER-FQDN/uaa/saml/metadata` and download the required XML file.
 
 ###<a id="configure-adfs-server"></a> Configure Your ADFS Server
-Now that you have completed the basic set up for Single Sign On support using SAML for PCF. Follow the steps below to complete the integration with your Active Directory Federation Server. Completign these steps allows users in the appropriate Windows AD Security Group to log in to Ops Manager.
+Now that you have completed the basic set up for SSO support using SAML for PCF. Follow the steps below to complete the integration with your Active Directory Federation Server. Completign these steps allows users in the appropriate Windows AD Security Group to log in to Ops Manager.
 #### Add Relying Party Trust
 1. Log in to your Active Directory Federation Services server and open the **ADFS Management** application.
 1. In the left pane, expand the **Trusts Relationships** directory.
