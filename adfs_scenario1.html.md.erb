@@ -1,42 +1,42 @@
 ---
 breadcrumb: Pivotal Cloud Foundry Documentation
-title: Confgiuring SAML for ADFS
+title: Configuring SAML for ADFS
 owner: Identity
 ---
 ##<a id="overview"></a>Overview 
 
 This topic explains how to integrate Active Directory Federation Services (ADFS) with PCF.
 
-##<a id="scenario-one-overview"></a>Scenario One Overview
+##<a id="scenario-one-overview"></a>Configure Ops Manager Access
 
-The step by step Ops Manager Access Workflow is explained below:
+The step-by-step Ops Manager Access Workflow is explained below:
 
-1. Users navigate to the PCF Ops Manager Login Screen – typically [https://PCF-IP/uaa](hhttps://PCF-IP/uaa) or [https://PCF-Hostname/uaa] (https://PCF-Hostname/uaa).
-1. PCF checks to see if the user is authenticated, because the user is not authenticated the application returns a status back to the user.
+1. Users navigate to the PCF Ops Manager Login Screen – typically [https://PCF-IP/uaa](https://PCF-IP/uaa) or [https://PCF-Hostname/uaa](https://PCF-Hostname/uaa).
+1. PCF checks to see if the user is authenticated. If the user is not authenticated the application returns a status back to the user.
 1. PCF creates a SAML assertion with the Microsoft ADFS server and redirects users to the Microsoft ADFS web portal to facilitate Single sign-on (SSO).
-1. Users enter their credentials at the ADFS portal login screen, these credentials are sent to the Microsoft Active Directory Server via Integrated Windows Authentication (IWA) usually Kerberos or NTLM.
-1. The Microsoft Active Directory Server performs a user lookup and validates user credentials.
-1. Active Directory returns a response to the ADFS server via IWA, additionally the ADFS processes claim rules set up for the claims aware application
-1. The ADFS Server sends a Security Token over TLS to the user with the requested claim rule information. Claim rules may be utilized to control specific access to applications and allow developers to build claim-aware applications to support Role Based Access Controls.
-1. The User sends the received token with associated claim rules back to the PCF portal.
+1. Users enter their credentials at the ADFS portal login screen. These credentials are sent to the Microsoft Active Directory Server (MADS) via Integrated Windows Authentication (IWA), usually Kerberos or NTLM.
+1. MADS performs a user lookup and validates user credentials.
+1. Active Directory returns a response to the ADFS server via IWA. Additionally, ADFS processes claim rules set up for the claims-aware application.
+1. The ADFS Server sends a Security Token over TLS to the user with the requested claim rule information. Claim rules may be used to control specific access to applications and allow developers to build claim-aware applications to support Role Based Access Controls.
+1. The user sends the received token with associated claim rules back to the PCF portal.
 1. If the ADFS Claim Rule passes and the correct information is presented to the PCF Ops Manager portal via the SAML token the user is logged into the Portal.
 
 Figure 2 - ADFS Login Portal
-##<a id="scenario-one-implementation"></a>Scenario One Implementation
+##<a id="scenario-one-implementation"></a>Implement SAML Access for Ops Manager
 ###<a id="configure-ops-manager"></a>Configure Ops Manager
-You can set up SAML based access for PCF Ops Manager uring the initial PCF installation or after installation. Follow the procedure below that corresponds to your use case. 
-####<a id="inital-installation"></a> Initial Installation
+You can set up SAML-based access for PCF Ops Manager during the initial PCF installation or after installation. Follow the procedure below that corresponds to your use case. 
+####<a id="inital-installation"></a> Setting SAML-based Access During Initial Installation
 If you are setting up SAML based access for PCF Ops Manager for the first time, follow these steps:
 
 1. From the **Welcome to Ops Manager** portal, click the **Use an Identity Provider** button.
-1. Paste the ADFS Metadata URL in the top box: `https://ADFS-FEDERATION-NAME/federationmetadata/200706/federationmetadata.xml`
+1. Paste the ADFS Metadata URL in the top box: `https://ADFS-FEDERATION-NAME/federationmetadata/200706/federationmetadata.xml`. Replace ADFS-FEDERATION-NAME with your ADFS Federation Name. 
 1. Enter your **Decryption Passphrase**. Read the **End User License Agreement**, and select the checkbox to accept the terms.
 1. Navigate to the following URL to obtain the XML file with information required for the ADFS setup `https://OPS-MANAGER-FQDN/uaa/saml/metadata` and download the required XML file.
 
 ####<a id="existing-installation"></a> Existing Installation
 If you have already installed Ops Manager, follow these steps: 
     
-1. From Ops Manager, expand the dropdown menu under your username in the top right corner. 
+1. From Ops Manager, expand the drop-down menu under your username in the top right corner. 
 1. Click **Settings**. 
 1. Select the **Authentication Method** configuration pane. 
 1. Complete the following fields:
@@ -49,7 +49,7 @@ If you have already installed Ops Manager, follow these steps:
 1. Navigate to the following URL to obtain the XML file with information required for the ADFS setup `https://OPS-MANAGER-FQDN/uaa/saml/metadata` and download the required XML file.
 
 ###<a id="configure-adfs-server"></a> Configure Your ADFS Server
-Now that you have completed the basic set up for SSO support using SAML for PCF. Follow the steps below to complete the integration with your Active Directory Federation Server. Completign these steps allows users in the appropriate Windows AD Security Group to log in to Ops Manager.
+Now that you have completed the basic set up for SSO support using SAML for PCF. Follow the steps below to complete the integration with your Active Directory Federation Server. Completing these steps allows users in the appropriate Windows AD Security Group to log in to Ops Manager.
 #### Add Relying Party Trust
 1. Log in to your Active Directory Federation Services server and open the **ADFS Management** application.
 1. In the left pane, expand the **Trusts Relationships** directory.
@@ -72,17 +72,17 @@ Now that you have completed the basic set up for SSO support using SAML for PCF.
 #### Create Your First Claim Rule
 1. Modify the **Claim Rules** associated with the **Relying Party Trust**. Right click on the new **Relying Party Trust** and select **Edit Claim Rules…**
 1. Select the first tab – **Issuance Transform Rules**
-1. Click the **Add Rule** button, a popup will appear.
-1. Keep **Send LDAP Attributes as Claims** template selected in the **Claim Rule Template** dropdown and click **Next**.
+1. Click the **Add Rule** button, a pop-up will appear.
+1. Keep **Send LDAP Attributes as Claims** template selected in the **Claim Rule Template** drop-down and click **Next**.
 1. Provide a claim rule name, for example `UPN to Email Address`.
 1. In the **Attribute Store** drop down, select the **Active Directory** option.
-1. Expand the **LDAP Attribute** dropdown and select **User-Principle-Name**.
+1. Expand the **LDAP Attribute** drop-down and select **User-Principle-Name**.
 1. Expand the **Outgoing Claim Type** and select **E-Mail Address**.
 1. Click the **Finish** button to create the first **Issuance Claim Rule**.
 
 #### Create a Second Claim Rule
-1. Click the **Add Rule** button, a popup will appear.
-1. Select **Transform An Incoming Claim** in the **Claim Rule Template** dropdown and click **Next**.
+1. Click the **Add Rule** button, a pop-up will appear.
+1. Select **Transform An Incoming Claim** in the **Claim Rule Template** drop-down and click **Next**.
 1. Provide a claim rule name, for example `NameID`.
 1. For the **Incoming Claim Type** select **E-Mail Address**.
 1. For the **Outgoing Claim Type** select **Name ID**.
@@ -92,10 +92,10 @@ Now that you have completed the basic set up for SSO support using SAML for PCF.
 
 #### Create a Third Claim Rule 
 1. Select the second tab – **Issuance Authorization Rules**
-1. Click the **Add Rule** button, a popup will appear.
-1. Keep **Permit or Deny Users Based on an Incoming Claim** selected in the **Claim Rule Template** dropdown and click **Next**.
+1. Click the **Add Rule** button, a pop-up will appear.
+1. Keep **Permit or Deny Users Based on an Incoming Claim** selected in the **Claim Rule Template** drop-down and click **Next**.
 1. Provide a claim rule name, for example `Permit PCF Ops Manager Users`.
-1. In the **Incoming Claim Type** dropdown select **Group SID**.
-1. Click the **Browse** button, a popup will appear. Search and locate the **Security Group** in your domain that PCF developers are a part of and press **OK**.
+1. In the **Incoming Claim Type** drop-down select **Group SID**.
+1. Click the **Browse** button, a pop-up will appear. Search and locate the **Security Group** in your domain that PCF developers are a part of and press **OK**.
 1. Ensure the radio button for **Permit access to users with this incoming claim** is selected.
 1. Click the **Finish** button to create the **Authorization Claim Rule**.
